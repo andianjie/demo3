@@ -19,16 +19,17 @@ public class ExpiredKeyListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         String channel = new String(pattern);
-        String messageBody = new String(message.getBody());
+        String key = new String(message.getBody());
 
         LOGGER.info("收到Redis消息通知：");
         LOGGER.info("频道：{}", channel);
-        LOGGER.info("消息内容：{}", messageBody);
-        // 这里可以添加您的业务逻辑
-        // 比如解析消息内容，进行相应处理
-        String id = messageBody.split(":")[1];
+        LOGGER.info("消息内容：{}",key);
+        // 判断key是否以coupon:开头
+        if(key.startsWith("coupon:")){
+        String id = key .split(":")[1];
         LOGGER.info("过期的key为：{}", id);
         couponMapper.updateState(Long.parseLong(id),1);
+        }
 
     }
 }

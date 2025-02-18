@@ -73,13 +73,13 @@ public class RedisTemplateTest {
         String key = "test:expire";
         
         // 设置值，1秒后过期
-        redisTemplate.opsForValue().set(key, "will expire", 1, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, "will expire", 5, TimeUnit.SECONDS);
         
         // 立即检查，键应该存在
         assertTrue(redisTemplate.hasKey(key));
         
         // 等待2秒
-        Thread.sleep(2000);
+        Thread.sleep(6000);
         
         // 键应该已经过期
         assertFalse(redisTemplate.hasKey(key));

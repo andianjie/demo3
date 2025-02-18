@@ -55,7 +55,7 @@ public class RedisConfig {
         
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(messageListener, topic);
+        container.addMessageListener(messageListener, topic );
         container.addMessageListener(expiredKeyListener, expiredKeyTopic);
         return container;
     }

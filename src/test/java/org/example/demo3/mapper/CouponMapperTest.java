@@ -98,7 +98,7 @@ public class CouponMapperTest {
         coupon.setMoney(money);
         coupon.setCouponDesc(desc);
         coupon.setCreateTime(LocalDateTime.now());
-        coupon.setExpireTime(LocalDateTime.now().plusSeconds(15)); // 15s后过期
+        coupon.setExpireTime(LocalDateTime.now().plusSeconds(55)); // 15s后过期
         coupon.setState(state);
         return coupon;
     }
