@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<tongweb>
+    <auto-deploy enabled="false" jsp-compile="false" dir="${tongweb.root}/autodeploy" check-interval="3000"/>
+    <hot-deploy enabled="false" watched-resource="WEB-INF/web.xml,MATA-INF/application.xml"/>
+    <apps>
+        <web-app name="console" original-location="${tongweb.upload}/console" location="${tongweb.sysapp}/console" context-root="/console" vs-names="admin" is-directory="true" enabled="true" description="console" deploy-order="1" object-type="sys" jsp-compile="false" dtd-validate="false" is-autodeploy="false" delegate="false"/>
+        <web-app name="heimdall" original-location="${tongweb.upload}/heimdall" location="${tongweb.sysapp}/heimdall" context-root="/heimdall" vs-names="admin" is-directory="true" enabled="true" description="heimdall" deploy-order="1" object-type="sys" jsp-compile="false" dtd-validate="false" is-autodeploy="false" delegate="false"/>
+        <web-app name="sysweb" original-location="${tongweb.upload}/sysweb" location="${tongweb.sysapp}/sysweb" context-root="/sysweb" vs-names="admin" is-directory="true" enabled="true" description="sysweb" deploy-order="1" object-type="sys" jsp-compile="false" dtd-validate="false" is-autodeploy="false" delegate="false"/>
+	<web-app name="damszkweb" original-location="/tongweb/TongWeb6.1/deployment/damszkweb" location="${tongweb.app}/damszkweb" context-root="/icbc/damsd" vs-names="server" is-directory="false" enabled="true" deploy-order="100" object-type="user" jsp-compile="false" dtd-validate="false" is-autodeploy="false" version="" retire-state="none" retire-strategy="nature" retire-timeout="0" version-serial-number="1" delegate="false"/>
+        <connector-app name="genericra" original-location="${tongweb.upload}/genericra" location="${tongweb.sysapp}/genericra" is-directory="true" enabled="true" thread-pool="default-thread-pool" deploy-order="1" object-type="sys" dtd-validate="false" is-autodeploy="false" version="">
+            <property name="LogLevel" value="INFO"/>
+            <property name="JndiProperties" value="java.naming.factory.initial=com.sun.jndi.fscontext.RefFSContextFactory,java.naming.provider.url=file:${tongweb.root}/apache-activemq/conf"/>
+            <property name="RMPolicy" value="OnePerPhysicalConnection"/>
+            <property name="SupportsXA" value="false"/>
+            <property name="ProviderIntegrationMode" value="jndi"/>
+        </connector-app>
+    </apps>
+    <server shutdown-port="8009" jsf="false">
+        <web-container jsp-development="true" parameter-encoding="GBK" response-encoding="GBK">
+            <access-log pattern="%{yyyyMMddHHmmssSSS}t %U %m %a %D" suffix=".txt" log-extend="false" file-date-format="yy.MM.dd.HH"/>
+            <virtual-host name="admin" listeners="system-http-listener" accesslog-enabled="false" accesslog-dir="logs/access" sso-enabled="false" remote-filter-enabled="false">
+                <sso/>
+                <remote-filter/>
+            </virtual-host>
+            <virtual-host name="server" listeners="tong-http-listener" accesslog-enabled="false" accesslog-dir="logs/access" sso-enabled="false" remote-filter-enabled="false" app-base="autodeploy" auto-deploy="true">
+                <sso/>
+                <remote-filter/>
+            </virtual-host>
+            <http-listener name="system-http-listener" port="9061" io-mode="nio2" redirect-port="8443" uri-encoding="GBK" parse-body-methods="POST,DELETE,PUT" default-virtual-host="admin" create-time="2019-10-29 10:54:11">
+                <ssl openssl-enabled="true" keystore-file="conf/server.keystore" keystore-pass="vVm6OyRRxhs3QGlTnzcKGA==" keystore-type="JKS" client-auth="false" ssl-protocol="TLS" truststore-file="conf/server.keystore" truststore-type="JKS"/>
+                <protocol/>
+                <http-options/>
+                <advance/>
+            </http-listener>
+            <http-listener name="tong-http-listener" port="8080" io-mode="nio2" redirect-port="8443" uri-encoding="GBK" parse-body-methods="POST" default-virtual-host="server" create-time="2019-10-29 10:54:11">
+                <ssl/>
+                <protocol not-allow-HTTP-methods="TRACE,OPTIONS,HEAD,CONNECT,DELETE" connection-timeout="60000" keep-alive-timeout="60000"/>
+                <http-options compression="off"/>
+                <advance/>
+                <property name="server" value="webserver"/>
+            </http-listener>
+            <http-listener name="ejb-server-listener" port="5100" uri-encoding="GBK" parse-body-methods="POST" default-virtual-host="admin" create-time="2019-10-29 10:54:12">
+                <ssl/>
+                <protocol/>
+                <http-options/>
+                <advance/>
+            </http-listener>
+            <property name="complete.message.timeout.seconds" value="0"/>
+            <property name="max.attack.times" value="3"/>
+            <property name="blacklist.expired.hours" value="12"/>
+            <property name="interrupt.current.connect" value="true"/>
+        </web-container>
+        <ejb-container>
+            <stateful/>
+            <singleton/>
+            <stateless max-age-offset="0"/>
+            <mdb/>
+        </ejb-container>
+        <security-service>
+            <auth-realm name="defaultRealm" type="File">
+                <property name="UsersFile" value="twusers.properties"/>
+                <property name="GroupsFile" value="twgroups.properties"/>
+            </auth-realm>
+        </security-service>
+        <transaction-service transaction-timeout-in-seconds="3600"/>
+	<jdbc-connection-pool name="gaussdb" jdbc-driver="org.postgresql.Driver" jdbc-url="jdbc:postgresql://76.182.178.82:8000,76.182.178.103:8000,84.174.155.129:8000,84.174.155.165:8000/dams?targetServerType=master" user-name="dams" password="jFI6tXkUXnYc7dRnrHEsZA==" jta-managed="true" default-auto-commit="true" commit-on-return="true" rollback-on-return="false" initial-size="20" max-active="100" max-idle="50" min-idle="10" max-wait-time="30000" validation-query="SELECT 1" validation-query-timeout="0" test-on-borrow="true" test-on-connect="false" test-on-return="false" test-while-idle="true" time-between-eviction-runs="5000" min-evictable-idle-time="2880000" remove-abandoned="false" propagate-interrupt-state="false" ignore-exception-on-pre-load="true" remove-abandoned-timeout="0" abandon-when-percentage-full="0" log-abandoned="false" jdbc-interceptors="QueryTimeoutInterceptor(queryTimeout=0)" validation-interval="30000" max-age="43200000" log-validation-errors="false" fair-queue="true" class-path="/tongweb/GaussDBV5-503.1.0.SPC2000_23.12.12.jar"/>
+        <monitor-service monitoring-enabled="true" flush-interval="60" flush-time-threshold="1800" persist-enabled="true" rotation-limit-val="10" rotation-limit-unit="MB">
+            <monitor-config name="Memory" monitoring-enabled="true" produce-interval="10" persistent-enabled="true"/>
+            <monitor-config name="JVMMemoryPool" monitoring-enabled="true" produce-interval="10" persistent-enabled="true"/>
+            <monitor-config name="GarbageCollector" monitoring-enabled="true" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="JVMThread" monitoring-enabled="true" produce-interval="10" persistent-enabled="true"/>
+            <monitor-config name="Compilation" monitoring-enabled="true" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="ClassLoading" monitoring-enabled="true" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="Runtime" monitoring-enabled="true" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="OperatingSystem" monitoring-enabled="true" produce-interval="10" persistent-enabled="true"/>
+            <monitor-config name="TWServer" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="ConnectorAndThreadPool" monitoring-enabled="true" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="DataSource" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="TransactionManager" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="JCA" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="WebModule" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="SessionManager" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="Loader" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+            <monitor-config name="ResourceCache" monitoring-enabled="false" produce-interval="10" persistent-enabled="false"/>
+        </monitor-service>
+        <jmx-service port="8443" address="127.0.0.1" protocol="rmi"/>
+        <jms-service/>
+        <log-service file="${tongweb.root}/logs/server.log" rotation-limit="50 MB" rotation-timelimit="0" rotation-file-count="20" rotation-by-day="false" log-format="[%d{yyyy-MM-dd HH:mm:ss SSS}] [%p] [%t] [%c] [%m]%n" rotation="true" verbose="false">
+            <module-log-levels ejb-container="INFO" web-container="INFO" cdi="INFO" jpa="INFO" jsf-impl="INFO" jsf-api="INFO" jta="INFO" jca="INFO" data-source="INFO" jms-resource="INFO" beanvalidation="INFO" naming="INFO" admin="INFO" configuration="INFO" deployment="INFO" monitor-service="INFO" core="INFO" security="INFO" rmi-service="INFO" systemout="INFO" other="INFO"/>
+            <async-logger-config asynclogger-waitstrategy="Sleep" asynclogger-ringbuffersize="1024"/>
+        </log-service>
+        <log-save-path sql-log-path="logs" audit-log-path="logs/audit-log" persistence-log-path="persistence"/>
+        <compress-log-service compress-enabled="false,false,false" log-dir="${tongweb.root}/logs/access,${tongweb.root}/logs/audit-log" compress-obj="1,2,3" rotation-time="1,1,1" execution-time="1,1,1"/>
+        <remote port="5100"/>
+        <jca-thread-pool name="default-thread-pool" min-threads="10" max-threads="200" queue="100" keep-alive-time="3600"/>
+    </server>
+    <snapshot>
+        <auto-snapshot interval-second="5" relation="or">
+            <contents jstack="true" jmap="true" config="true" monitor="true" system-log="true" access-log="true" gc-log="true"/>
+            <cpu-condition times="10" times-unit="time" judgment="above" judgmentvalue="90%"/>
+            <memory-condition times="10" times-unit="time" judgment="above" judgmentvalue="90%"/>
+            <gc-condition judgment="above" judgmentvalue="60"/>
+            <halthttp-condition httpname="tong-http-listener" judgment="above" judgmentvalue="200"/>
+        </auto-snapshot>
+        <size-clear disk-remain-percent="20%" clear-percent="60%"/>
+        <time-clear timeout-day="30"/>
+    </snapshot>
+</tongweb>

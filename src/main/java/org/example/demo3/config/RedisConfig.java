@@ -1,5 +1,6 @@
 package org.example.demo3.config;
 
+import org.example.demo3.Redis.ExpiredKeyListener;
 import org.example.demo3.Redis.RedisMessageListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,16 +40,23 @@ public class RedisConfig {
     public ChannelTopic topic() {
         return new ChannelTopic("myRedis");
     }
+    @Bean
+    public ChannelTopic expiredKeyTopic() {
+        return new ChannelTopic("__keyevent@0__:expired");
+    }
 
     @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(
-            RedisConnectionFactory connectionFactory,
-            RedisMessageListener messageListener,
-            ChannelTopic topic) {
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory connectionFactory,
+                                                                       RedisMessageListener messageListener,
+                                                                       ChannelTopic topic,
+                                                                       ExpiredKeyListener expiredKeyListener,
+                                                                       ChannelTopic expiredKeyTopic)
+    {
         
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.addMessageListener(messageListener, topic);
+        container.addMessageListener(expiredKeyListener, expiredKeyTopic);
         return container;
     }
 }
